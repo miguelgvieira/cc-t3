@@ -7,7 +7,6 @@ class VarTypes(Enum):
     real = 3
     logico = 4
 
-
 # Esse enumerável contém os tipos de expressões para nossa linguagem
 # Ele é utilizado para percorrer a árvore sintática e verificar a qual
 # tipo de expressão cada nó pertence, para que possamos verificar mais a fundo

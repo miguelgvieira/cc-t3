@@ -15,18 +15,26 @@ from alguma_utils import VarTypes
 class SymTable():
     def __init__(self):
         self.table = {}
+    
+    def check_if_ponteiro(self, var_type):
+        if "^" in var_type:
+            return True
+        return False
 
     def add(self, name, var_type, value=None):
         if name in self.table:
             raise Exception(f"identificador {name} ja declarado anteriormente")
 
+        is_ponteiro = self.check_if_ponteiro(var_type)
+
         self.table[name] = {
-            "type": var_type,
+            "type": var_type.replace("^", "", 1),
             "value": value,
-            "name": name
+            "name": name,
+            "ponteiro": is_ponteiro
         }
 
-        if var_type not in VarTypes.__members__:
+        if self.table[name]["type"] not in VarTypes.__members__:
             raise Exception(f"tipo {var_type} nao declarado")
 
     def check_if_exists(self, name):
