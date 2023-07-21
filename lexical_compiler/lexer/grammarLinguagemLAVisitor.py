@@ -259,5 +259,10 @@ class grammarLinguagemLAVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by grammarLinguagemLAParser#ponteiro.
+    def visitPonteiro(self, ctx:grammarLinguagemLAParser.PonteiroContext):
+        return self.visitChildren(ctx)
+
+
 
 del grammarLinguagemLAParser

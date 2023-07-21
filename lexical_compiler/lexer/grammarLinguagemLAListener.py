@@ -458,5 +458,14 @@ class grammarLinguagemLAListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by grammarLinguagemLAParser#ponteiro.
+    def enterPonteiro(self, ctx:grammarLinguagemLAParser.PonteiroContext):
+        pass
+
+    # Exit a parse tree produced by grammarLinguagemLAParser#ponteiro.
+    def exitPonteiro(self, ctx:grammarLinguagemLAParser.PonteiroContext):
+        pass
+
+
 
 del grammarLinguagemLAParser

@@ -6,6 +6,7 @@ class VarTypes(Enum):
     inteiro = 2
     real = 3
     logico = 4
+    registro = 5
 
 # Esse enumerável contém os tipos de expressões para nossa linguagem
 # Ele é utilizado para percorrer a árvore sintática e verificar a qual
@@ -40,7 +41,11 @@ class AlgumaUtils():
         if hasattr(parcela, "exp_aritmetica") and parcela.exp_aritmetica() is not None:
             self.verify_exp_aritmetica(parcela.exp_aritmetica(), ret)
         if hasattr(parcela, "identificador") and parcela.identificador() is not None:
-            return self.sym_table.check_if_exists(parcela.identificador().getText())
+            var = self.sym_table.check_if_exists(parcela.identificador().getText())
+            if var:
+                return var
+            else:
+                raise Exception(f"identificador {parcela.identificador().getText()} nao declarado")
         if hasattr(parcela, "CADEIA") and parcela.CADEIA() is not None:
             return {
                 "type": VarTypes.literal.name,
@@ -87,6 +92,10 @@ class AlgumaUtils():
                         ExprTypes(i).name == "parcela_nao_unario" or \
                         ExprTypes(i).name == "parcela_logica":
 
+                        if ExprTypes(i).name == "parcela_unario":
+                            self.verify_if_function(func())
+                            continue
+
                         parcela = self.verify_parcela(func(), ret)
 
                         if parcela:
@@ -95,7 +104,7 @@ class AlgumaUtils():
                     else:
                         self.verify_exp_aritmetica(func(), ret)
         return ret
-    
+
     # Verificamos se a expressão possui operadores relacionais
     def verify_exp_logica(self, vars):
         for var in vars.values():
@@ -108,20 +117,69 @@ class AlgumaUtils():
     # de origem. Se forem compatíveis, a atribuição é válida.
     # Senão levantamos uma exceção
     def command_attr(self, ctx):
+        if ctx.ponteiro() is not None:
+            ponteiro = "^"
+        else:
+            ponteiro = ""
+
         var_dest = self.sym_table.check_if_exists(ctx.identificador().getText())
+
+        if var_dest is None:
+            raise Exception(f"identificador {ctx.identificador().getText()} nao declarado")
 
         used_vars = self.verify_exp_aritmetica(ctx.expressao().termo_logico(), {})
 
         exp_logica = self.verify_exp_logica(used_vars)
-
         if exp_logica:
             if var_dest["type"] != VarTypes.logico.name:
-                raise Exception(f"atribuicao nao compativel para {var_dest['name']}")
+                raise Exception(f"atribuicao nao compativel para {ponteiro}{ctx.identificador().getText()}")
         else:
             for var in used_vars.values():
                 if var["type"] != var_dest["type"]:
                     if (var["type"] == VarTypes.inteiro.name or var["type"] == VarTypes.real.name) \
                         and (var_dest["type"] == VarTypes.real.name or var_dest["type"] == VarTypes.inteiro.name):
                         continue
-                    raise Exception(f"atribuicao nao compativel para {var_dest['name']}")
+                    raise Exception(f"atribuicao nao compativel para {ponteiro}{ctx.identificador().getText()}")
 
+    def verify_if_function(self, f):
+        if hasattr(f, "IDENT") and f.IDENT() is not None \
+            and hasattr(f, "expressao") and f.expressao() is not None:
+            return self.call_function(f)
+
+    def call_function(self, fun):
+        name = fun.IDENT()
+        params = fun.expressao()
+        function = self.sym_table.functions[name.getText()]
+        if len(params) != len(function["params"]):
+            print("1")
+            raise Exception(f"incompatibilidade de parametros na chamada de {name.getText()}")
+        for i in range(len(params)):
+            param_name = list(function["params"].keys())[i]
+            called_name = params[i].getText().split("[")[0]
+
+            if self.sym_table.check_if_exists(called_name):
+                if self.sym_table.get_type(name=called_name) \
+                    != function["params"][param_name]["type"]:
+                    print("2")
+                    raise Exception(f"incompatibilidade de parametros na chamada de {name.getText()}")
+            else:
+                if "(" in called_name:
+                    possible_function = called_name.split("(")[0]
+                    if possible_function in self.sym_table.functions.keys():
+                        if self.sym_table.functions[possible_function]["return_type"] \
+                            != function["params"][param_name]["type"]:
+                            print("3")
+                            raise Exception(f"incompatibilidade de parametros na chamada de {name.getText()}")
+                if hasattr(params[i], "termo_logico") and params[i].termo_logico() is not None:
+                    self.verify_exp_aritmetica(params[i].termo_logico())
+                return function
+
+        return function
+
+    def validate_retorne(self):
+        if self.sym_table.context != 'global':
+            function_context = self.sym_table.get_function_context()
+            if function_context["return_type"] is None:
+                raise Exception("comando retorne nao permitido nesse escopo")
+        raise Exception("comando retorne nao permitido nesse escopo")
+        

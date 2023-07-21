@@ -53,14 +53,14 @@ parametro : 'var'? identificador (',' identificador)* ':' tipo_estendido ;
 parametros : parametro (',' parametro)* ;
 corpo : (declaracao_local)* (cmd)* ;
 cmd : cmdleia | cmdescreva | cmdse | cmdcaso | cmdpara | cmdenquanto | cmdfaca | cmdatribuicao | cmdchamada | cmdretorno ;
-cmdleia : 'leia' '(' '^'? identificador (',' '^'? identificador)*  ')' ;
+cmdleia : 'leia' '(' ponteiro? identificador (',' ponteiro? identificador)*  ')' ;
 cmdescreva : 'escreva' '(' expressao (',' expressao)*  ')' ;
 cmdse : 'se' expressao 'entao' (cmd)* ('senao' (cmd)*)? 'fim_se' ;
 cmdcaso : 'caso' exp_aritmetica 'seja' selecao ('senao' (cmd)*)? 'fim_caso' ;
 cmdpara : 'para' IDENT '<-' exp_aritmetica 'ate' exp_aritmetica 'faca' (cmd)* 'fim_para' ;
 cmdenquanto : 'enquanto' expressao 'faca' (cmd)* 'fim_enquanto' ;
 cmdfaca : 'faca' (cmd)* 'ate' expressao ;
-cmdatribuicao : '^'? identificador '<-' expressao ;
+cmdatribuicao : ponteiro? identificador '<-' expressao ;
 cmdchamada : IDENT '(' expressao (',' expressao)* ')' ;
 cmdretorno : 'retorne' expressao ;
 selecao : (item_selecao)* ;
@@ -75,7 +75,7 @@ op1 : '+' | '-' ;
 op2 : '*' | '/' ;
 op3 : '%' ;
 parcela : op_unario? parcela_unario | parcela_nao_unario ;
-parcela_unario : '^'? identificador
+parcela_unario : ponteiro? identificador
 			| IDENT '(' expressao (',' expressao)* ')'
 			| NUM_INT
 			| NUM_REAL
@@ -89,3 +89,4 @@ fator_logico : 'nao'? parcela_logica ;
 parcela_logica : ( 'verdadeiro' | 'falso' ) | exp_relacional ;
 op_logico_1 : 'ou' ;
 op_logico_2 : 'e' ;
+ponteiro : '^' ;
