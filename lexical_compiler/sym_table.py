@@ -103,6 +103,11 @@ class SymTable():
         return None, name
 
     def add_var(self, name, complement, value=None, is_const=False):
+        if self.context == "global":
+            existing_vars = self.table.copy()
+        else:
+            existing_vars = self.functions[self.function_name]["params"]
+
         if self.check_if_identificador_exists(name):
             raise Exception(f"identificador {name} ja declarado anteriormente")
 
@@ -122,7 +127,7 @@ class SymTable():
 
         vetor, name = self.check_if_vetor(name)
 
-        self.table[name] = {
+        existing_vars[name] = {
             "type": var_type,
             "value": value,
             "name": name,
@@ -133,6 +138,11 @@ class SymTable():
 
         if self.check_if_tipo_exists(var_type):
             raise Exception(f"tipo {var_type} nao declarado")
+
+        if self.context == "global":
+            self.table = existing_vars
+        else:
+            self.functions[self.function_name]["params"] = existing_vars
 
     def check_if_exists(self, name):
         if self.context == 'local':

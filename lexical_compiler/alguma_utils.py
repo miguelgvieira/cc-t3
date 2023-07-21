@@ -93,8 +93,8 @@ class AlgumaUtils():
                         ExprTypes(i).name == "parcela_logica":
 
                         if ExprTypes(i).name == "parcela_unario":
-                            self.verify_if_function(func())
-                            continue
+                            if self.verify_if_function(func()):
+                                continue
 
                         parcela = self.verify_parcela(func(), ret)
 
@@ -141,17 +141,19 @@ class AlgumaUtils():
                         continue
                     raise Exception(f"atribuicao nao compativel para {ponteiro}{ctx.identificador().getText()}")
 
+    # Verifica se um dado contexto é uma função
     def verify_if_function(self, f):
         if hasattr(f, "IDENT") and f.IDENT() is not None \
             and hasattr(f, "expressao") and f.expressao() is not None:
             return self.call_function(f)
 
+    # Faz uma "chamada" de função. Verifica se os parâmetros recebidos são válidos,
+    # o número de parâmetros, tipo de parâmetros.
     def call_function(self, fun):
         name = fun.IDENT()
         params = fun.expressao()
         function = self.sym_table.functions[name.getText()]
         if len(params) != len(function["params"]):
-            print("1")
             raise Exception(f"incompatibilidade de parametros na chamada de {name.getText()}")
         for i in range(len(params)):
             param_name = list(function["params"].keys())[i]
@@ -160,7 +162,6 @@ class AlgumaUtils():
             if self.sym_table.check_if_exists(called_name):
                 if self.sym_table.get_type(name=called_name) \
                     != function["params"][param_name]["type"]:
-                    print("2")
                     raise Exception(f"incompatibilidade de parametros na chamada de {name.getText()}")
             else:
                 if "(" in called_name:
@@ -168,7 +169,6 @@ class AlgumaUtils():
                     if possible_function in self.sym_table.functions.keys():
                         if self.sym_table.functions[possible_function]["return_type"] \
                             != function["params"][param_name]["type"]:
-                            print("3")
                             raise Exception(f"incompatibilidade de parametros na chamada de {name.getText()}")
                 if hasattr(params[i], "termo_logico") and params[i].termo_logico() is not None:
                     self.verify_exp_aritmetica(params[i].termo_logico())
@@ -176,10 +176,11 @@ class AlgumaUtils():
 
         return function
 
+    # Função que valida se um retorno está declarado num local correto.
     def validate_retorne(self):
         if self.sym_table.context != 'global':
             function_context = self.sym_table.get_function_context()
             if function_context["return_type"] is None:
                 raise Exception("comando retorne nao permitido nesse escopo")
-        raise Exception("comando retorne nao permitido nesse escopo")
-        
+        else:
+            raise Exception("comando retorne nao permitido nesse escopo")

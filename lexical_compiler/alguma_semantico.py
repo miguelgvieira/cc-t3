@@ -52,8 +52,7 @@ class AlgumaSemantico(grammarLinguagemLAVisitor) :
                     "message": str(e),
                     "line": ctx.start.line
                     })
-                
-        print_dict(self.sym_table.table)
+
         return self.visitChildren(ctx)
 
     def visitDeclaracao_global(self, ctx:grammarLinguagemLAParser.Declaracao_globalContext):
