@@ -1,6 +1,6 @@
 # cc-t1
 
-Branch com o trabalho 4 de construção de compiladores.
+Branch com o trabalho 5 de construção de compiladores.
 
 # Aluno
 

@@ -14,6 +14,7 @@ class AlgumaSemantico(grammarLinguagemLAVisitor) :
     def __init__(self):
         self.sym_table = SymTable()
         self.errors = []
+        self.generated_code = []
         self.utils = AlgumaUtils(self.sym_table)
 
     # Modificamos o método visitVariavel para verificar se a declaração

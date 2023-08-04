@@ -230,8 +230,7 @@ class grammarLinguagemLAParser ( Parser ):
                      "'faca'", "'fim_para'", "'enquanto'", "'fim_enquanto'", 
                      "'retorne'", "'..'", "'-'", "'+'", "'*'", "'/'", "'%'", 
                      "'&'", "'<>'", "'>='", "'<='", "'>'", "'<'", "'nao'", 
-                     "'ou'", "'e'", "<INVALID>", "<INVALID>", "<INVALID>", 
-                     "<INVALID>", "'\\\"'" ]
+                     "'ou'", "'e'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 

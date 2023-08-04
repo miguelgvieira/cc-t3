@@ -67,7 +67,6 @@ class SymTable():
 
                 self.check_if_tipo_exists(param_type)
 
-
                 for new_type in self.new_types.keys():
                     if new_type == param_type:
                         value = self.new_types[new_type]["value"].copy()

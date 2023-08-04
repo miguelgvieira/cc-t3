@@ -22,7 +22,7 @@ from alguma_lexer import AlgumaLexerAnalyzer
 def main(args):
     # Verifica se os argumentos foram passados corretamente
     if len(args) != 2:
-        print("Usage: python3 main.py input/file.txt output/file.txt")
+        print("Usage: python3 main.py input/file.txt output/file.c")
         sys.exit(1)
 
     # Verifica se o arquivo de entrada existe
@@ -30,7 +30,7 @@ def main(args):
         print(args[0])
         print("Input file does not exist")
         sys.exit(1)
-    
+
     # Verifica se a pasta destino existe, se não existir, cria
     if not os.path.isdir(os.path.dirname(args[1])):
         os.makedirs(os.path.dirname(args[1]))

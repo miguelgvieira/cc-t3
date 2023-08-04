@@ -7,6 +7,29 @@ class VarTypes(Enum):
     real = 3
     logico = 4
     registro = 5
+    cadeia = 6
+
+class VarNameTypes(str, Enum):
+    inteiro = "int"
+    real = "float"
+    logico = "bool"
+    literal = "char"
+
+class ControlChars(str, Enum):
+    inteiro = "%d"
+    real = "%f"
+    literal = "%s"
+
+switcher_operators = {
+    "=": "==",
+    "<>": "!=",
+    ">": ">",
+    "<": "<",
+    ">=": ">=",
+    "<=": "<=",
+    "e": "&&",
+    "nao": "!",
+}
 
 # Esse enumerável contém os tipos de expressões para nossa linguagem
 # Ele é utilizado para percorrer a árvore sintática e verificar a qual
@@ -34,6 +57,8 @@ class AlgumaUtils():
     # a expressão aritmética, e retorna a informação da folha. Senão apenas retorna
     # o as informações da folha
     def verify_parcela(self, parcela, ret):
+        if parcela is None:
+            return None
         if hasattr(parcela, "expressao") and parcela.expressao() is not None:
             self.verify_exp_aritmetica(parcela.expressao(), ret)
         if hasattr(parcela, "exp_relacional") and parcela.exp_relacional() is not None:
@@ -48,7 +73,7 @@ class AlgumaUtils():
                 raise Exception(f"identificador {parcela.identificador().getText()} nao declarado")
         if hasattr(parcela, "CADEIA") and parcela.CADEIA() is not None:
             return {
-                "type": VarTypes.literal.name,
+                "type": VarTypes.cadeia.name,
                 "value": parcela.CADEIA().getText(),
                 "name": parcela.CADEIA().getText()
             }
@@ -130,14 +155,18 @@ class AlgumaUtils():
         used_vars = self.verify_exp_aritmetica(ctx.expressao().termo_logico(), {})
 
         exp_logica = self.verify_exp_logica(used_vars)
+
         if exp_logica:
             if var_dest["type"] != VarTypes.logico.name:
                 raise Exception(f"atribuicao nao compativel para {ponteiro}{ctx.identificador().getText()}")
         else:
             for var in used_vars.values():
+                comparacao_cadeia = [VarTypes.cadeia.name, VarTypes.literal.name]
+                comparacao_numeral = [VarTypes.inteiro.name, VarTypes.real.name]
                 if var["type"] != var_dest["type"]:
-                    if (var["type"] == VarTypes.inteiro.name or var["type"] == VarTypes.real.name) \
-                        and (var_dest["type"] == VarTypes.real.name or var_dest["type"] == VarTypes.inteiro.name):
+                    if var_dest["type"] in comparacao_numeral and var["type"] in comparacao_numeral:
+                        continue
+                    if var_dest["type"] in comparacao_cadeia and var["type"] in comparacao_cadeia:
                         continue
                     raise Exception(f"atribuicao nao compativel para {ponteiro}{ctx.identificador().getText()}")
 

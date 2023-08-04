@@ -5,6 +5,7 @@ from lexer.grammarLinguagemLAListener import grammarLinguagemLAListener
 from error_handling import LexerErrorHandler
 from error_handling import ParserErrorHandler
 from alguma_semantico import AlgumaSemantico
+from alguma_gerador_c import AlgumaGeradorC
 
 """
     Classe responsável por analisar o arquivo de entrada e gerar o arquivo de saída
@@ -42,9 +43,12 @@ class AlgumaLexerAnalyzer():
 
         self.parser.removeErrorListeners()
         self.parser.addErrorListener(ParserErrorHandler())
-    
+
     def write_error(self, error):
         self.output_stream.write(f"Linha {error['line']}: {error['message']}\n")
+
+    def write_code(self, code):
+        self.output_stream.write(code + "\n")
 
     def analyse_file(self, input_file, output_file):
         self.input_stream = FileStream(input_file, encoding='utf-8')
@@ -60,11 +64,23 @@ class AlgumaLexerAnalyzer():
         tree = self.parser.programa()
 
         alguma_semantico = AlgumaSemantico()
+
+        alguma_gerador_c = AlgumaGeradorC(alguma_semantico.sym_table)
+
         alguma_semantico.visitPrograma(tree)
 
-        for error in alguma_semantico.errors:
-            self.write_error(error)
+        alguma_gerador_c.visitPrograma(tree)
 
-        self.output_stream.write("Fim da compilacao\n")
+        if len(alguma_semantico.errors) > 0:
+            for error in alguma_semantico.errors:
+                self.write_error(error)
+            self.output_stream.write("Fim da compilacao\n")
+        else:
+            for header in alguma_gerador_c.headers:
+                self.write_code(header)
+
+            for code_line in alguma_gerador_c.code:
+                self.write_code(code_line)
+
 
         self.output_stream.close()
