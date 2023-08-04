@@ -1,1 +1,6 @@
 *.pyc
+t1-cc/*
+*.txt
+*.c
+*.alg
+*.out

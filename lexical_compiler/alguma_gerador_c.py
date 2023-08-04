@@ -123,7 +123,6 @@ class AlgumaGeradorC(ParseTreeVisitor):
 
     # Visit a parse tree produced by grammarLinguagemLAParser#tipo.
     def visitTipo(self, ctx:grammarLinguagemLAParser.TipoContext):
-        print(ctx.getText())
         return self.visitChildren(ctx)
 
 
